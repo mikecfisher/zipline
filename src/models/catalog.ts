@@ -9,11 +9,15 @@ export class Catalog {
     await prisma.product.deleteMany({});
   }
 
-  async init(products: ProductWithoutID[]): Promise<void> {
-    for (const product of products) {
-      // Prisma createMany() is not supported by sqlLite so we have to use a loop 
+  async init_catalog(product_info: any[]): Promise<void> {
+    for (const product of product_info) {
       await prisma.product.create({
-        data: product,
+        data: {
+          mass_g: product.mass_g,
+          product_name: product.product_name,
+          product_id: product.product_id,
+          inventoryCount: 0,
+        },
       });
     }
   }
@@ -21,7 +25,7 @@ export class Catalog {
   async getProductDetails(productId: number): Promise<{ mass_g: number, product_name: string, product_id: number } | null> {
     const details = await prisma.product.findUnique({
       where: {
-        id: productId,
+        product_id: productId,
       },
     });
     return details;
@@ -30,7 +34,7 @@ export class Catalog {
   async hasProduct(productId: number): Promise<boolean> {
     const productCount = await prisma.product.count({
       where: {
-        id: productId,
+        product_id: productId,
       },
     });
     return productCount > 0;

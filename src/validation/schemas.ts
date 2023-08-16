@@ -14,7 +14,6 @@ const orderItemSchema = z.object({
 });
 
 export const processOrderSchema = z.object({
-  order_id: z.number(),
   requested: z.array(orderItemSchema),
 });
 

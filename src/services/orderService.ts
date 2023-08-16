@@ -1,17 +1,14 @@
 import { Catalog } from '../models/catalog';
 import { Inventory } from '../models/inventory';
 import { ProcessOrder } from '../validation/schemas';
+import { shipPackage as ship_package } from './shippingService';
 
 const MAX_SHIPMENT_WEIGHT = 1800; // 1.8kg in grams
 
 const inventory = new Inventory();
 const catalog = new Catalog();
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-function ship_package({ order_id, shipped }: { order_id: number; shipped: { product_id: number, quantity: number }[]  }) {
-  // stubbed function
-  console.log('shipping', order_id, shipped);
-}
+
 
 export async function processOrder(order: ProcessOrder): Promise<void> {
   const itemsToShip: { product_id: number, quantity: number }[] = [];
@@ -45,7 +42,7 @@ export async function processOrder(order: ProcessOrder): Promise<void> {
   for (const item of itemsToShip) {
     const productDetails = await catalog.getProductDetails(item.product_id);
 
-    if (!productDetails) throw new Error('no products'); // Or throw an error.
+    if (!productDetails) throw new Error('no products'); 
 
     const productWeight = productDetails.mass_g * item.quantity;
 

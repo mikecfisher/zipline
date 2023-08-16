@@ -10,7 +10,7 @@ export class Inventory {
   async addProducts(products: { product_id: number, quantity: number }[]): Promise<void> {
     for (const product of products) {
       // Check if the product is already in the inventory
-      const existingProduct = await prisma.order.findFirst({
+      const existingProduct = await prisma.product.findFirst({
         where: {
           product_id: product.product_id,
         },
@@ -18,23 +18,16 @@ export class Inventory {
 
       if (existingProduct) {
         // Update the quantity of the existing product
-        await prisma.order.update({
+        await prisma.product.update({
           where: {
-            id: existingProduct.id,
+            product_id: existingProduct.product_id,
           },
           data: {
-            quantity: existingProduct.quantity + product.quantity,
+            inventoryCount: existingProduct.inventoryCount + product.quantity,
           },
         });
       } else {
         // Add new product to the inventory
-        await prisma.order.create({
-          data: {
-            product_id: product.product_id,
-            quantity: product.quantity,
-            order_id: 0, // Placeholder. Ideally we should update this logic if `order_id` has a special meaning.
-          },
-        });
       }
     }
   }
@@ -45,18 +38,18 @@ export class Inventory {
    */
   async reduceProducts(products: { product_id: number, quantity: number }[]): Promise<void> {
     for (const product of products) {
-      const inventoryItem = await prisma.order.findFirst({
+      const inventoryItem = await prisma.product.findFirst({
         where: {
           product_id: product.product_id,
         },
       });
-      if (inventoryItem && inventoryItem.quantity >= product.quantity) {
-        await prisma.order.update({
+      if (inventoryItem && inventoryItem.inventoryCount >= product.quantity) {
+        await prisma.product.update({
           where: {
-            id: inventoryItem.id,
+            product_id: inventoryItem.product_id,
           },
           data: {
-            quantity: inventoryItem.quantity - product.quantity,
+            inventoryCount: inventoryItem.inventoryCount - product.quantity,
           },
         });
       }
@@ -70,11 +63,11 @@ export class Inventory {
    * @returns The quantity of the product in the inventory.
    */
   async getProductQuantity(productId: number): Promise<number> {
-    const inventoryItem = await prisma.order.findFirst({
+    const inventoryItem = await prisma.product.findFirst({
       where: {
         product_id: productId,
       },
     });
-    return inventoryItem?.quantity || 0;
+    return inventoryItem?.inventoryCount || 0;
   }
 }

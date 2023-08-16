@@ -7,16 +7,47 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// Product details from the catalog
 model Product {
-  id           Int    @id @default(autoincrement())
-  mass_g       Float
-  product_name String
-  product_id   Int
+  product_id     Int            @id @default(autoincrement())
+  mass_g         Int // Weight in grams
+  product_name   String         @unique
+  orders         OrderItem[]
+  shipments      ShipmentItem[]
+  inventoryCount Int
 }
 
+// Order from a hospital
 model Order {
-  id         Int @id @default(autoincrement())
-  order_id   Int
-  product_id Int
+  order_id  Int         @id @default(autoincrement())
+  items     OrderItem[]
+  shipments Shipment[]
+}
+
+// Items in an order
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [product_id])
+  productId Int
+  quantity  Int
+  order     Order   @relation(fields: [orderId], references: [order_id])
+  orderId   Int
+}
+
+// A shipment to fulfill an order
+model Shipment {
+  id      Int            @id @default(autoincrement())
+  order   Order          @relation(fields: [orderId], references: [order_id])
+  orderId Int
+  items   ShipmentItem[]
+}
+
+// Items in a shipment
+model ShipmentItem {
+  id         Int      @id @default(autoincrement())
+  product    Product  @relation(fields: [productId], references: [product_id])
+  productId  Int
   quantity   Int
+  shipment   Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId Int
 }
