@@ -1,11 +1,13 @@
 import express from 'express';
 import { initCatalogSchema, processOrderSchema, processRestockSchema } from '../validation/schemas';
+import { initializeCatalog } from '../services/catalogService';
 
 export const apiRouter = express.Router();
 
 apiRouter.post('/init_catalog', (req, res) => {
   try {
     const validatedData = initCatalogSchema.parse(req.body);
+    initializeCatalog(validatedData);
     // do something
     res.send({ success: true, message: 'Catalog initialized' });
   } catch (err) {
