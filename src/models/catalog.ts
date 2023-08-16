@@ -17,4 +17,22 @@ export class Catalog {
       });
     }
   }
+
+  async getProductDetails(productId: number): Promise<{ mass_g: number, product_name: string, product_id: number } | null> {
+    const details = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+    return details;
+  }
+
+  async hasProduct(productId: number): Promise<boolean> {
+    const productCount = await prisma.product.count({
+      where: {
+        id: productId,
+      },
+    });
+    return productCount > 0;
+  }
 }

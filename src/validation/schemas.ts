@@ -18,5 +18,8 @@ export const processOrderSchema = z.object({
   requested: z.array(orderItemSchema),
 });
 
+export type OrderItem = z.infer<typeof orderItemSchema>;
+export type ProcessOrder = z.infer<typeof processOrderSchema>;
+
 const restockItemSchema = orderItemSchema; // Since both have product_id and quantity
 export const processRestockSchema = z.array(restockItemSchema);
